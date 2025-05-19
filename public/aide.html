@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Aide - CodeMaster</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #1e1e2f, #2e2e4e, #3e3e6d);
+      background-size: 400% 400%;
+      animation: gradientMove 10s ease infinite;
+      color: white;
+      line-height: 1.6;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    section {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 800px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    ul {
+      list-style: disc inside;
+    }
+
+    a {
+      color: #99d9ff;
+      text-decoration: underline;
+    }
+
+    button {
+      margin-top: 30px;
+      padding: 10px 20px;
+      background-color: #333;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Comment jouer à CodeMaster ?</h1>
+
+  <section>
+    <h2>But du jeu</h2>
+    <p>
+      Le but est de deviner un code secret de 4 chiffres défini par l'adversaire (ou généré aléatoirement en solo).
+    </p>
+
+    <h2>Fonctionnement</h2>
+    <ul>
+      <li>Chaque chiffre doit être compris entre 0 et 9.</li>
+      <li>À chaque essai, le système vous indiquera :
+        <ul>
+          <li>Combien de chiffres sont corrects (peu importe la place).</li>
+          <li>Combien de chiffres sont à la bonne position.</li>
+        </ul>
+      </li>
+      <li>Exemple :
+        <br> Code secret : <strong>3455</strong>
+        <br> Proposition : <strong>4205</strong>
+        <br> Résultat : <strong>2 chiffres corrects, 1 bien placé</strong>
+      </li>
+    </ul>
+
+    <h2>Modes de jeu</h2>
+    <ul>
+      <li><strong>Solo :</strong> contre l’IA (ou code généré)</li>
+      <li><strong>Duel :</strong> contre un autre joueur en ligne</li>
+    </ul>
+
+    <h2>Fonctionnalités supplémentaires</h2>
+    <ul>
+      <li>Classement global</li>
+      <li>Invitations de duel en temps réel</li>
+      <li>Chat multijoueur</li>
+      <li>Système de scores et abandon</li>
+      <li>Thèmes sombre & clair</li>
+    </ul>
+
+    <h2>Conseils</h2>
+    <ul>
+      <li>Essayez des combinaisons variées au début</li>
+      <li>Notez les indices pour affiner progressivement</li>
+    </ul>
+
+    <button onclick="window.location.href='index.html'">Retour au menu</button>
+  </section>
+
+</body>
+</html>
