@@ -3,24 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CodeMaster - Accueil</title>
+  <title>CodeMaster - Connexion</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="center">
-    <h1>Bienvenue sur <span class="gradient">CodeMaster</span></h1>
-    <p>Devine le code secret de ton adversaire ou affronte l'IA !</p>
-    <div class="btn-group">
-      <a href="login.html" class="btn">Connexion / Inscription</a>
-      <a href="game.html" class="btn">Jouer en invité</a>
-    </div>
-  </main>
+  <div class="container">
+    <h1>Bienvenue sur CodeMaster</h1>
+    <div class="form-container">
+      <form id="login-form">
+        <h2>Connexion</h2>
+        <input type="email" id="login-email" placeholder="Email" required />
+        <input type="password" id="login-password" placeholder="Mot de passe" required />
+        <button type="submit">Se connecter</button>
+      </form>
 
-  <script>
-    // Exemple : redirection automatique si déjà connecté
-    // fetch("/check-auth").then(r => r.json()).then(data => {
-    //   if (data.authenticated) window.location.href = "/game.html";
-    // });
-  </script>
+      <form id="register-form">
+        <h2>Inscription</h2>
+        <input type="text" id="register-username" placeholder="Pseudo" required />
+        <input type="email" id="register-email" placeholder="Email" required />
+        <input type="password" id="register-password" placeholder="Mot de passe" required />
+        <button type="submit">S'inscrire</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="index.js"></script>
 </body>
 </html>
