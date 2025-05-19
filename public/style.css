@@ -37,3 +37,31 @@ button:hover {
   background-color: white;
   color: #1e3c72;
 }
+
+.form-container {
+  background-color: #ffffff15;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px #00000060;
+  text-align: center;
+}
+
+input {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 1em;
+}
+
+form button {
+  background-color: white;
+  color: #1e3c72;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: bold;
+}
