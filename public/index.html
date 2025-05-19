@@ -99,5 +99,19 @@
       window.location.reload();
     }
   </script>
+  <script>
+  const themeBtn = document.getElementById("toggleTheme");
+  const currentTheme = localStorage.getItem("theme");
+
+  if (currentTheme === "light") {
+    document.body.classList.add("light-theme");
+  }
+
+  themeBtn.addEventListener("click", () => {
+    document.body.classList.toggle("light-theme");
+    const isLight = document.body.classList.contains("light-theme");
+    localStorage.setItem("theme", isLight ? "light" : "dark");
+  });
+  </script>
 </body>
 </html>
