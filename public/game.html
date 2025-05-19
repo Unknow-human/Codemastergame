@@ -1,120 +1,181 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>CodeMaster - Jeu</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>CodeMaster Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-      color: #fff;
-      font-family: "Segoe UI", sans-serif;
-      text-align: center;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
       padding: 20px;
+      background: linear-gradient(-45deg, #1e1e2f, #2f2f3f, #1a1a2a, #3f3f5f);
+      background-size: 400% 400%;
+      animation: gradient 10s ease infinite;
+      color: #fff;
     }
 
-    h1 {
-      font-size: 3em;
-      margin-bottom: 20px;
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
-    .mode-select button,
-    #gameArea button {
-      margin: 10px;
-      padding: 10px 20px;
+    h1, h2 {
+      text-align: center;
+    }
+
+    .section {
+      margin: 20px auto;
+      max-width: 500px;
+      background: #222;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #0006;
+    }
+
+    button {
+      padding: 10px 15px;
       border: none;
-      background-color: #6a5acd;
+      background: #00c3ff;
       color: white;
-      border-radius: 10px;
-      font-size: 1em;
+      font-weight: bold;
       cursor: pointer;
-      transition: all 0.3s ease;
+      border-radius: 6px;
     }
 
     button:hover {
-      background-color: #483d8b;
+      background: #0099cc;
     }
 
     input {
       padding: 10px;
-      font-size: 1.1em;
-      border-radius: 5px;
+      width: 80%;
       border: none;
+      border-radius: 6px;
+      margin-top: 10px;
       margin-bottom: 10px;
-      text-align: center;
     }
 
-    #guessHistory {
-      margin-top: 20px;
-    }
-
-    .duel-section {
-      margin-top: 30px;
-    }
-
-    .duel-section ul {
+    ul {
       list-style: none;
-      padding: 0;
+      padding-left: 0;
     }
 
-    .duel-section li {
-      margin: 8px 0;
+    li {
+      margin-bottom: 8px;
     }
 
-    .duel-section button {
+    .flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .small {
       font-size: 0.9em;
-      padding: 5px 10px;
-      margin-left: 10px;
+      opacity: 0.7;
     }
   </style>
 </head>
 <body>
-  <main class="game-container">
-    <h1>CodeMaster</h1>
-    <div id="welcomeUser"></div>
 
-    <div class="mode-select">
-      <button onclick="startGame('solo')">Mode Solo</button>
-    </div>
+  <h1>CodeMaster Duel</h1>
 
-    <div class="duel-section">
-      <h3>Joueurs en ligne :</h3>
-      <ul id="userList"></ul>
-    </div>
-
-    <div id="gameArea" style="display: none;">
-      <p id="gameStatus"></p>
-      <input type="text" id="guessInput" maxlength="4" placeholder="Entrez un code à 4 chiffres" />
-      <br />
-      <button onclick="submitGuess()">Valider</button>
+  <div class="section">
+    <h2 id="gameStatus">Mode solo</h2>
+    <div id="gameArea">
+      <input id="guessInput" type="text" placeholder="Entrez un code à 4 chiffres">
+      <button onclick="submitGuess()">Proposer</button>
       <button onclick="abandonGame()">Abandonner</button>
       <div id="guessHistory"></div>
     </div>
-  </main>
+  </div>
 
-  <!-- SCRIPTS -->
+  <div class="section">
+    <h2>Joueurs en ligne</h2>
+    <ul id="userList"></ul>
+  </div>
+
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
     const socket = io();
-    let mode = "solo";
-    let secretCode = "";
-    let playing = false;
-    const username = localStorage.getItem("username");
 
-    if (!username) {
-      window.location.href = "login.html";
-    } else {
-      document.getElementById("welcomeUser").innerText = `Bienvenue ${username} !`;
-      socket.emit("identify", username);
+    const username = localStorage.getItem("username") || prompt("Ton pseudo :");
+    localStorage.setItem("username", username);
+    socket.emit("identify", username);
+
+    let secretCode = generateCode();
+    let roomId = "";
+    let isDuel = false;
+    let playing = true;
+
+    function generateCode() {
+      return Math.floor(1000 + Math.random() * 9000).toString();
     }
+
+    function checkGuess(secret, guess) {
+      let correct = 0, wellPlaced = 0;
+      const s = secret.split("");
+      const g = guess.split("");
+
+      g.forEach((digit, i) => {
+        if (s.includes(digit)) correct++;
+        if (digit === s[i]) wellPlaced++;
+      });
+
+      return `${correct} chiffres corrects, ${wellPlaced} bien placés`;
+    }
+
+    function submitGuess() {
+      const guess = document.getElementById("guessInput").value;
+      if (!/^\d{4}$/.test(guess)) return alert("Code invalide.");
+      document.getElementById("guessInput").value = "";
+
+      if (isDuel) {
+        socket.emit("submitGuess", { roomId, guess });
+      } else {
+        const result = checkGuess(secretCode, guess);
+        document.getElementById("guessHistory").innerHTML += `<p>${guess} → ${result}</p>`;
+        if (guess === secretCode) {
+          playing = false;
+          alert("Tu as gagné !");
+        }
+      }
+    }
+
+    function abandonGame() {
+      if (!playing) return;
+      if (isDuel) {
+        socket.emit("abandon", { roomId });
+      } else {
+        alert("Tu as abandonné.");
+        playing = false;
+      }
+    }
+
+    function sendDuelRequest(toUser) {
+      socket.emit("duelRequest", { from: username, to: toUser });
+      alert(`Invitation envoyée à ${toUser}`);
+    }
+
+    function startDuel(opponent) {
+      isDuel = true;
+      secretCode = prompt("Entre ton code secret à 4 chiffres :");
+      if (!/^\d{4}$/.test(secretCode)) return alert("Code invalide.");
+      socket.emit("startDuelGame", { opponent, code: secretCode });
+    }
+
+    // SOCKET.IO EVENTS
 
     socket.on("userList", (list) => {
       const ul = document.getElementById("userList");
       ul.innerHTML = "";
-      list.forEach((user) => {
+      list.forEach(user => {
         if (user !== username) {
           const li = document.createElement("li");
-          li.innerHTML = `${user} <button onclick="sendDuelRequest('${user}')">Défier</button>`;
+          li.className = "flex";
+          li.innerHTML = `<span>${user}</span> <button onclick="sendDuelRequest('${user}')">Défier</button>`;
           ul.appendChild(li);
         }
       });
@@ -138,68 +199,25 @@
       }
     });
 
-    function sendDuelRequest(toUser) {
-      socket.emit("duelRequest", { from: username, to: toUser });
-      alert(`Invitation envoyée à ${toUser}`);
-    }
-
-    function startGame(selectedMode) {
-      mode = selectedMode;
-      secretCode = generateCode();
-      playing = true;
+    socket.on("duelStarted", (data) => {
+      roomId = data.roomId;
+      document.getElementById("gameStatus").innerText = "Duel en cours ! Devine le code adverse.";
       document.getElementById("gameArea").style.display = "block";
-      document.getElementById("gameStatus").innerText = `Le jeu a commencé (${mode}) !`;
-      document.getElementById("guessHistory").innerHTML = "";
-    }
+    });
 
-    function startDuel(opponent) {
-      mode = "duel";
-      secretCode = generateCode();
-      playing = true;
-      document.getElementById("gameArea").style.display = "block";
-      document.getElementById("gameStatus").innerText = `Duel en cours contre ${opponent} !`;
-      document.getElementById("guessHistory").innerHTML = "";
-    }
-
-    function generateCode() {
-      let code = "";
-      for (let i = 0; i < 4; i++) code += Math.floor(Math.random() * 10);
-      return code;
-    }
-
-    function submitGuess() {
-      if (!playing) return;
-      const guess = document.getElementById("guessInput").value;
-      if (guess.length !== 4 || isNaN(guess)) return alert("Entrez 4 chiffres !");
-      const result = checkGuess(secretCode, guess);
+    socket.on("guessResult", ({ guess, result }) => {
       document.getElementById("guessHistory").innerHTML += `<p>${guess} → ${result}</p>`;
-      document.getElementById("guessInput").value = "";
+    });
 
-      if (guess === secretCode) {
-        playing = false;
-        alert("Félicitations ! Tu as trouvé le code !");
-        document.getElementById("gameStatus").innerText = "Tu as gagné !";
-      }
-    }
-
-    function abandonGame() {
+    socket.on("duelEnded", ({ winner, abandon, code }) => {
+      const msg = winner === socket.id
+        ? "Tu as gagné !"
+        : (abandon ? "Ton adversaire a abandonné." : "Tu as perdu.");
+      alert(`${msg} Le code était : ${code}`);
+      document.getElementById("gameStatus").innerText = "Duel terminé.";
       playing = false;
-      alert("Tu as abandonné. Le code était : " + secretCode);
-      document.getElementById("gameStatus").innerText = "Jeu terminé.";
-    }
-
-    function checkGuess(secret, guess) {
-      let correct = 0, wellPlaced = 0;
-      const secretArray = secret.split("");
-      const guessArray = guess.split("");
-
-      guessArray.forEach((digit, index) => {
-        if (secretArray.includes(digit)) correct++;
-        if (digit === secretArray[index]) wellPlaced++;
-      });
-
-      return `${correct} chiffre(s) correct(s), ${wellPlaced} bien placé(s)`;
-    }
+      isDuel = false;
+    });
   </script>
 </body>
 </html>
