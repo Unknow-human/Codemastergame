@@ -1,60 +1,146 @@
 const socket = io();
 
-// Formulaires
-const loginForm = document.getElementById("login-form");
-const registerForm = document.getElementById("register-form");
+// Elements DOM
+const authContainer = document.getElementById("auth-container");
+const lobbyContainer = document.getElementById("lobby-container");
+const authForm = document.getElementById("auth-form");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const loginBtn = document.getElementById("login-btn");
+const registerBtn = document.getElementById("register-btn");
+const authError = document.getElementById("auth-error");
+const usernameDisplay = document.getElementById("username-display");
+const logoutBtn = document.getElementById("logout-btn");
+const userListSection = document.getElementById("user-list-section");
+const userList = document.getElementById("user-list");
+const toggleThemeBtn = document.getElementById("toggle-theme");
 
-// Connexion
-loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+let currentUser = null;
+let token = null;
 
-  const email = document.getElementById("login-email").value;
-  const password = document.getElementById("login-password").value;
-
-  try {
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("username", data.username);
-      window.location.href = "/game.html";
-    } else {
-      alert(data.error || "Erreur de connexion.");
-    }
-  } catch (err) {
-    alert("Une erreur est survenue.");
+// Toggle thème clair/sombre
+function loadTheme() {
+  const theme = localStorage.getItem("theme") || "light";
+  if (theme === "dark") {
+    document.body.classList.add("dark");
+    toggleThemeBtn.textContent = "Mode Clair";
+  } else {
+    document.body.classList.remove("dark");
+    toggleThemeBtn.textContent = "Mode Sombre";
+  }
+}
+toggleThemeBtn.addEventListener("click", () => {
+  if (document.body.classList.contains("dark")) {
+    document.body.classList.remove("dark");
+    localStorage.setItem("theme", "light");
+    toggleThemeBtn.textContent = "Mode Sombre";
+  } else {
+    document.body.classList.add("dark");
+    localStorage.setItem("theme", "dark");
+    toggleThemeBtn.textContent = "Mode Clair";
   }
 });
+loadTheme();
+
+// Affiche lobby et initialise socket
+function showLobby(username) {
+  currentUser = username;
+  usernameDisplay.textContent = username;
+  authContainer.style.display = "none";
+  lobbyContainer.style.display = "block";
+  userListSection.style.display = "none";
+  authError.textContent = "";
+
+  // Informer serveur socket de l'identité
+  socket.emit("identify", username);
+}
+
+// Affiche erreur
+function showError(msg) {
+  authError.textContent = msg;
+}
 
 // Inscription
-registerForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+registerBtn.addEventListener("click", async () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
 
-  const username = document.getElementById("register-username").value;
-  const email = document.getElementById("register-email").value;
-  const password = document.getElementById("register-password").value;
+  if (!email || !password) {
+    showError("Merci de remplir email et mot de passe.");
+    return;
+  }
 
   try {
     const res = await fetch("/api/register", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, password })
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ email, password, username: email.split("@")[0] })
     });
+    const data = await res.json();
+    if (!res.ok) {
+      showError(data.error || "Erreur inscription.");
+      return;
+    }
+    alert("Inscription réussie, veuillez vous connecter.");
+  } catch (err) {
+    showError("Erreur réseau.");
+  }
+});
 
+// Connexion
+authForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+
+  if (!email || !password) {
+    showError("Merci de remplir email et mot de passe.");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ email, password })
+    });
     const data = await res.json();
 
-    if (res.ok) {
-      alert("Inscription réussie. Connectez-vous.");
-    } else {
-      alert(data.error || "Erreur lors de l'inscription.");
+    if (!res.ok) {
+      showError(data.error || "Erreur connexion.");
+      return;
     }
+
+    token = data.token;
+    showLobby(data.username);
   } catch (err) {
-    alert("Une erreur est survenue.");
+    showError("Erreur réseau.");
+  }
+});
+
+// Logout
+logoutBtn.addEventListener("click", () => {
+  token = null;
+  currentUser = null;
+  authContainer.style.display = "block";
+  lobbyContainer.style.display = "none";
+  authError.textContent = "";
+});
+
+// Mise à jour liste utilisateurs en ligne
+socket.on("userList", (users) => {
+  userList.innerHTML = "";
+  users.forEach(user => {
+    if (user !== currentUser) {
+      const li = document.createElement("li");
+      li.textContent = user;
+      userList.appendChild(li);
+    }
+  });
+  if (users.length > 1) {
+    userListSection.style.display = "block";
+  } else {
+    userListSection.style.display = "none";
   }
 });
