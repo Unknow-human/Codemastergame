@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Connexion - CodeMaster</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="form-container">
+    <h2>Connexion</h2>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Mot de passe" required />
+      <button type="submit">Se connecter</button>
+    </form>
+    <p>Pas encore inscrit ? <a href="register.html">Créer un compte</a></p>
+  </main>
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("username", data.username);
+        alert("Connexion réussie !");
+        window.location.href = "index.html"; // ou "game.html" plus tard
+      } else {
+        alert(data.error || "Erreur de connexion");
+      }
+    });
+  </script>
+</body>
+</html>
