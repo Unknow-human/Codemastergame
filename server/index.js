@@ -89,6 +89,9 @@ io.on("connection", (socket) => {
       io.to(toSocket).emit("duelRequestReceived", { from });
     }
   });
+  socket.on("chatMessage", ({ username, message }) => {
+  io.emit("chatMessage", { username, message });
+});
 
   // Répondre à l'invitation
   socket.on("duelResponse", ({ from, to, accepted }) => {
