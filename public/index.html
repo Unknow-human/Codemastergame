@@ -2,116 +2,25 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CodeMaster</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CodeMaster - Accueil</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background: linear-gradient(-45deg, #1e3c72, #2a5298, #3b8d99, #6dd5ed);
-      background-size: 400% 400%;
-      animation: gradientBG 10s ease infinite;
-      color: white;
-      text-align: center;
-      padding: 20px;
-    }
-
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    main {
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 20px;
-      padding: 30px 20px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-    }
-
-    h1 {
-      margin-bottom: 20px;
-      font-size: 2em;
-    }
-
-    button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      font-size: 1em;
-      border: none;
-      border-radius: 8px;
-      background: #fff;
-      color: #1e3c72;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    button:hover {
-      background: #ddd;
-    }
-
-    p {
-      font-size: 1em;
-      margin-bottom: 10px;
-    }
-
-    strong {
-      color: #fff;
-    }
-  </style>
 </head>
 <body>
-  <main class="game-container">
-    <h1>Bienvenue sur CodeMaster</h1>
-    <div id="userSection"></div>
+  <main class="center">
+    <h1>Bienvenue sur <span class="gradient">CodeMaster</span></h1>
+    <p>Devine le code secret de ton adversaire ou affronte l'IA !</p>
+    <div class="btn-group">
+      <a href="login.html" class="btn">Connexion / Inscription</a>
+      <a href="game.html" class="btn">Jouer en invité</a>
+    </div>
   </main>
 
   <script>
-    const userSection = document.getElementById("userSection");
-    const username = localStorage.getItem("username");
-
-    if (username) {
-      userSection.innerHTML = `
-        <p>Connecté en tant que <strong>${username}</strong></p>
-        <button onclick="window.location.href='game.html'">Jouer</button>
-        <button onclick="logout()">Déconnexion</button>
-      `;
-    } else {
-      userSection.innerHTML = `
-        <button onclick="window.location.href='register.html'">Créer un compte</button>
-        <button onclick="window.location.href='login.html'">Se connecter</button>
-      `;
-    }
-
-    function logout() {
-      localStorage.removeItem("username");
-      localStorage.removeItem("token");
-      window.location.reload();
-    }
-  </script>
-  <script>
-  const themeBtn = document.getElementById("toggleTheme");
-  const currentTheme = localStorage.getItem("theme");
-
-  if (currentTheme === "light") {
-    document.body.classList.add("light-theme");
-  }
-
-  themeBtn.addEventListener("click", () => {
-    document.body.classList.toggle("light-theme");
-    const isLight = document.body.classList.contains("light-theme");
-    localStorage.setItem("theme", isLight ? "light" : "dark");
-  });
+    // Exemple : redirection automatique si déjà connecté
+    // fetch("/check-auth").then(r => r.json()).then(data => {
+    //   if (data.authenticated) window.location.href = "/game.html";
+    // });
   </script>
 </body>
 </html>
