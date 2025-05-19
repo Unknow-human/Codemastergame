@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Classement - CodeMaster</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <main class="center">
+    <h1>Classement</h1>
+    <table>
+      <thead>
+        <tr><th>Rang</th><th>Joueur</th><th>Victoires</th></tr>
+      </thead>
+      <tbody id="leaderboardBody">
+        <!-- rempli dynamiquement -->
+      </tbody>
+    </table>
+    <a href="game.html" class="btn">Retour au jeu</a>
+  </main>
+
+  <script>
+    fetch("/api/leaderboard").then(res => res.json()).then(data => {
+      const tbody = document.getElementById("leaderboardBody");
+      data.forEach((user, i) => {
+        const row = `<tr>
+          <td>${i + 1}</td>
+          <td>${user.username}</td>
+          <td>${user.wins}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+      });
+    });
+  </script>
+</body>
+</html>
