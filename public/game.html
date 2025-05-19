@@ -4,6 +4,69 @@
   <meta charset="UTF-8" />
   <title>CodeMaster - Jeu</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      font-family: "Segoe UI", sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+
+    .mode-select button,
+    #gameArea button {
+      margin: 10px;
+      padding: 10px 20px;
+      border: none;
+      background-color: #6a5acd;
+      color: white;
+      border-radius: 10px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #483d8b;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 1.1em;
+      border-radius: 5px;
+      border: none;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    #guessHistory {
+      margin-top: 20px;
+    }
+
+    .duel-section {
+      margin-top: 30px;
+    }
+
+    .duel-section ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .duel-section li {
+      margin: 8px 0;
+    }
+
+    .duel-section button {
+      font-size: 0.9em;
+      padding: 5px 10px;
+      margin-left: 10px;
+    }
+  </style>
 </head>
 <body>
   <main class="game-container">
@@ -12,29 +75,73 @@
 
     <div class="mode-select">
       <button onclick="startGame('solo')">Mode Solo</button>
-      <button onclick="startGame('duel')">Mode Duel</button>
+    </div>
+
+    <div class="duel-section">
+      <h3>Joueurs en ligne :</h3>
+      <ul id="userList"></ul>
     </div>
 
     <div id="gameArea" style="display: none;">
       <p id="gameStatus"></p>
       <input type="text" id="guessInput" maxlength="4" placeholder="Entrez un code à 4 chiffres" />
+      <br />
       <button onclick="submitGuess()">Valider</button>
       <button onclick="abandonGame()">Abandonner</button>
       <div id="guessHistory"></div>
     </div>
   </main>
 
+  <!-- SCRIPTS -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
+    const socket = io();
     let mode = "solo";
     let secretCode = "";
     let playing = false;
-    let score = 0;
+    const username = localStorage.getItem("username");
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const username = localStorage.getItem("username");
-      if (!username) return window.location.href = "login.html";
+    if (!username) {
+      window.location.href = "login.html";
+    } else {
       document.getElementById("welcomeUser").innerText = `Bienvenue ${username} !`;
+      socket.emit("identify", username);
+    }
+
+    socket.on("userList", (list) => {
+      const ul = document.getElementById("userList");
+      ul.innerHTML = "";
+      list.forEach((user) => {
+        if (user !== username) {
+          const li = document.createElement("li");
+          li.innerHTML = `${user} <button onclick="sendDuelRequest('${user}')">Défier</button>`;
+          ul.appendChild(li);
+        }
+      });
     });
+
+    socket.on("duelRequestReceived", ({ from }) => {
+      if (confirm(`${from} veut te défier ! Accepter ?`)) {
+        socket.emit("duelResponse", { from: username, to: from, accepted: true });
+        startDuel(from);
+      } else {
+        socket.emit("duelResponse", { from: username, to: from, accepted: false });
+      }
+    });
+
+    socket.on("duelResponseReceived", ({ from, accepted }) => {
+      if (accepted) {
+        alert(`${from} a accepté ! Le duel commence.`);
+        startDuel(from);
+      } else {
+        alert(`${from} a refusé ton invitation.`);
+      }
+    });
+
+    function sendDuelRequest(toUser) {
+      socket.emit("duelRequest", { from: username, to: toUser });
+      alert(`Invitation envoyée à ${toUser}`);
+    }
 
     function startGame(selectedMode) {
       mode = selectedMode;
@@ -42,6 +149,15 @@
       playing = true;
       document.getElementById("gameArea").style.display = "block";
       document.getElementById("gameStatus").innerText = `Le jeu a commencé (${mode}) !`;
+      document.getElementById("guessHistory").innerHTML = "";
+    }
+
+    function startDuel(opponent) {
+      mode = "duel";
+      secretCode = generateCode();
+      playing = true;
+      document.getElementById("gameArea").style.display = "block";
+      document.getElementById("gameStatus").innerText = `Duel en cours contre ${opponent} !`;
       document.getElementById("guessHistory").innerHTML = "";
     }
 
