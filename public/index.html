@@ -1,19 +1,126 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CodeMaster</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CodeMaster - Accueil</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      background: linear-gradient(-45deg, #1e3c72, #2a5298, #0f2027, #203a43);
+      background-size: 400% 400%;
+      animation: gradientMove 15s ease infinite;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 0.2em;
+      text-shadow: 2px 2px 5px black;
+    }
+
+    p {
+      font-size: 1.2em;
+      max-width: 600px;
+      text-align: center;
+      margin-bottom: 2em;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid white;
+      color: white;
+      padding: 12px 25px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: white;
+      color: #1e3c72;
+    }
+
+    #welcome {
+      margin-bottom: 1em;
+      font-weight: bold;
+    }
+
+    footer {
+      margin-top: 3em;
+      font-size: 0.9em;
+      opacity: 0.6;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2em;
+      }
+      p {
+        font-size: 1em;
+      }
+    }
+  </style>
 </head>
 <body>
-  <main class="game-container">
-    <h1>Bienvenue sur CodeMaster</h1>
-    <button onclick="startSoloGame()">Jouer en Solo</button>
-    <button onclick="goToLogin()">Connexion</button>
-    <a href="game.html" class="btn">Lancer le jeu</a>
-  </main>
+  <h1>Bienvenue sur CodeMaster</h1>
+  <p>
+    Défiez vos amis ou entraînez-vous en solo pour trouver un code secret à 4 chiffres ! Obtenez des indices à chaque tentative. Le premier à deviner gagne !
+  </p>
 
-  <script src="main.js"></script>
+  <div id="welcome"></div>
+
+  <div class="btn-group" id="btns-not-logged">
+    <a href="register.html" class="btn">Créer un compte</a>
+    <a href="login.html" class="btn">Connexion</a>
+  </div>
+
+  <div class="btn-group" id="btns-logged" style="display: none;">
+    <a href="game.html" class="btn">Lancer le jeu</a>
+    <a href="aide.html" class="btn">Aide</a>
+    <button class="btn" onclick="logout()">Déconnexion</button>
+  </div>
+
+  <footer>
+    Projet développé avec Node.js + Render | GitHub: <a href="https://github.com/Unknow-human/Codemastergame" style="color: lightblue;">@Unknow-human</a>
+  </footer>
+
+  <script>
+    const username = localStorage.getItem("username");
+    if (username) {
+      document.getElementById("btns-not-logged").style.display = "none";
+      document.getElementById("btns-logged").style.display = "flex";
+      document.getElementById("welcome").textContent = `Bienvenue ${username} !`;
+    }
+
+    function logout() {
+      localStorage.clear();
+      alert("Déconnecté !");
+      window.location.reload();
+    }
+  </script>
 </body>
 </html>
