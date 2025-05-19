@@ -1,14 +1,26 @@
+:root {
+  --bg-color: #1e1e2f;
+  --text-color: #fff;
+  --card-bg: #222;
+  --btn-bg: #00c3ff;
+  --btn-hover: #0099cc;
+}
+
+.light-theme {
+  --bg-color: #f5f5f5;
+  --text-color: #111;
+  --card-bg: #fff;
+  --btn-bg: #005b96;
+  --btn-hover: #003f6b;
+}
+
 body {
-  margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: linear-gradient(-45deg, #1e3c72, #2a5298, #1e3c72, #2a5298);
-  background-size: 400% 400%;
-  animation: gradient 10s ease infinite;
-  color: white;
+  margin: 0;
+  padding: 20px;
+  background: var(--bg-color);
+  color: var(--text-color);
+  transition: background 0.4s, color 0.4s;
 }
 
 @keyframes gradient {
@@ -21,23 +33,15 @@ body {
   text-align: center;
 }
 
+.section {
+  background: var(--card-bg);
+}
 button {
-  padding: 10px 20px;
-  margin: 10px;
-  background-color: #ffffff20;
-  border: 2px solid white;
-  color: white;
-  border-radius: 10px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  background: var(--btn-bg);
 }
-
 button:hover {
-  background-color: white;
-  color: #1e3c72;
+  background: var(--btn-hover);
 }
-
 .form-container {
   background-color: #ffffff15;
   padding: 30px;
