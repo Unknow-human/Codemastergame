@@ -1,72 +1,88 @@
 :root {
-  --bg-color: #1e1e2f;
-  --text-color: #ffffff;
-  --card-bg: #2e2e3e;
-  --btn-bg: #00c3ff;
-  --btn-hover: #0099cc;
-}
-
-.light-theme {
-  --bg-color: #f4f4f4;
-  --text-color: #111;
-  --card-bg: #fff;
-  --btn-bg: #005b96;
-  --btn-hover: #003f6b;
+  --primary-color: #00ffe1;
+  --text-light: #f0f0f0;
+  --text-dark: #1a1a1a;
+  --bg-light: #ffffff;
+  --bg-dark: #121212;
+  --accent-color: #ff00cc;
 }
 
 body {
-  font-family: 'Segoe UI', sans-serif;
   margin: 0;
-  padding: 30px;
-  background: var(--bg-color);
-  color: var(--text-color);
-  transition: background 0.5s, color 0.5s;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: background 0.6s ease, color 0.6s ease;
+  min-height: 100vh;
+  background: linear-gradient(-45deg, #ff00cc, #3333ff, #00ffe1, #ffcc00);
+  background-size: 400% 400%;
+  animation: gradientBG 10s ease infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
 }
 
-.center {
+@keyframes gradientBG {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
+}
+
+.container {
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
   text-align: center;
-  max-width: 600px;
-  margin: auto;
+  width: 90%;
+  max-width: 500px;
 }
 
-input, button {
-  padding: 10px;
-  margin: 5px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: none;
+h1 {
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: var(--primary-color);
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 input {
-  width: 70%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
 }
 
-button, .btn {
-  background: var(--btn-bg);
-  color: #fff;
+button {
+  padding: 12px;
+  background-color: var(--primary-color);
+  color: black;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  text-decoration: none;
-  transition: 0.3s;
+  transition: background 0.3s ease;
 }
 
-button:hover, .btn:hover {
-  background: var(--btn-hover);
+button:hover {
+  background-color: var(--accent-color);
+  color: white;
 }
 
-.gradient {
-  background: linear-gradient(45deg, #00c3ff, #ff4f8b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-table {
-  width: 100%;
-  margin-top: 20px;
-  border-collapse: collapse;
-}
-
-th, td {
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
-  color: var(--text-color);
+@media (prefers-color-scheme: light) {
+  body {
+    color: var(--text-dark);
+  }
+  .container {
+    background-color: rgba(255, 255, 255, 0.8);
+  }
 }
