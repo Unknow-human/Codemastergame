@@ -27,6 +27,35 @@ app.use(express.static(path.join(__dirname, "../public")));
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/index.html"));
 });
+// Inscription
+app.post("/api/register", async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ username, email, password: hashedPassword });
+    await newUser.save();
+    res.status(201).json({ message: "Utilisateur créé avec succès !" });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Connexion
+app.post("/api/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ error: "Utilisateur non trouvé" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ error: "Mot de passe incorrect" });
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "2h" });
+    res.json({ token, username: user.username });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // WebSocket pour duels, matchmaking, chat (sera complété ensuite)
 io.on("connection", (socket) => {
