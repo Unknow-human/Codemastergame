@@ -105,6 +105,74 @@ io.on("connection", (socket) => {
     io.emit("userList", Object.keys(users));
     console.log("Utilisateur déconnecté :", socket.id);
   });
+  const duels = {}; // { roomId: { players: [player1, player2], codes: {}, guesses: {} } }
+
+socket.on("startDuelGame", ({ opponent, code }) => {
+  const roomId = [socket.id, users[opponent]].sort().join("-");
+  socket.join(roomId);
+
+  if (!duels[roomId]) {
+    duels[roomId] = {
+      players: [socket.id],
+      codes: { [socket.id]: code },
+      guesses: {}
+    };
+  } else {
+    duels[roomId].players.push(socket.id);
+    duels[roomId].codes[socket.id] = code;
+  }
+
+  // Une fois 2 codes reçus, commencer le duel
+  if (Object.keys(duels[roomId].codes).length === 2) {
+    io.to(roomId).emit("duelStarted", { roomId });
+  }
+});
+
+// Réception des propositions
+socket.on("submitGuess", ({ roomId, guess }) => {
+  const duel = duels[roomId];
+  if (!duel) return;
+
+  const opponentId = duel.players.find(p => p !== socket.id);
+  const opponentCode = duel.codes[opponentId];
+
+  const result = checkGuess(opponentCode, guess);
+
+  io.to(socket.id).emit("guessResult", { guess, result });
+
+  if (guess === opponentCode) {
+    io.to(roomId).emit("duelEnded", {
+      winner: socket.id,
+      code: opponentCode
+    });
+    delete duels[roomId];
+  }
+});
+
+socket.on("abandon", ({ roomId }) => {
+  const duel = duels[roomId];
+  if (!duel) return;
+
+  const opponentId = duel.players.find(p => p !== socket.id);
+  io.to(roomId).emit("duelEnded", {
+    winner: opponentId,
+    abandon: true
+  });
+  delete duels[roomId];
+});
+
+function checkGuess(secret, guess) {
+  let correct = 0, wellPlaced = 0;
+  const s = secret.split("");
+  const g = guess.split("");
+
+  g.forEach((digit, i) => {
+    if (s.includes(digit)) correct++;
+    if (digit === s[i]) wellPlaced++;
+  });
+
+  return `${correct} chiffres corrects, ${wellPlaced} bien placés`;
+}
 });
 
 
