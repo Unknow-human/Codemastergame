@@ -58,13 +58,55 @@ app.post("/api/login", async (req, res) => {
 });
 
 // WebSocket pour duels, matchmaking, chat (sera complété ensuite)
+let users ={};
+
+const http = require("http");
+const socketio = require("socket.io");
+
+const server = http.createServer(app);
+const io = socketio(server, {
+  cors: {
+    origin: "*",
+  },
+});
+
+// Liste des utilisateurs connectés
+let users = {};
+
 io.on("connection", (socket) => {
-  console.log("Un joueur est connecté : " + socket.id);
+  console.log("Un utilisateur connecté :", socket.id);
+
+  // Lorsqu'un joueur s'identifie
+  socket.on("identify", (username) => {
+    users[username] = socket.id;
+    io.emit("userList", Object.keys(users)); // mettre à jour la liste
+  });
+
+  // Envoyer une invitation de duel
+  socket.on("duelRequest", ({ from, to }) => {
+    const toSocket = users[to];
+    if (toSocket) {
+      io.to(toSocket).emit("duelRequestReceived", { from });
+    }
+  });
+
+  // Répondre à l'invitation
+  socket.on("duelResponse", ({ from, to, accepted }) => {
+    const toSocket = users[to];
+    if (toSocket) {
+      io.to(toSocket).emit("duelResponseReceived", { from, accepted });
+    }
+  });
 
   socket.on("disconnect", () => {
-    console.log("Un joueur s'est déconnecté : " + socket.id);
+    for (const user in users) {
+      if (users[user] === socket.id) delete users[user];
+    }
+    io.emit("userList", Object.keys(users));
+    console.log("Utilisateur déconnecté :", socket.id);
   });
 });
+
 
 // Lancer le serveur
 const PORT = process.env.PORT || 3000;
