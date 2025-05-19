@@ -1,37 +1,108 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Classement - CodeMaster</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(-45deg, #1e1e2f, #2e2e4e, #3e3e6d);
+      background-size: 400% 400%;
+      animation: gradientMove 10s ease infinite;
+      color: white;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      max-width: 800px;
+      margin: auto;
+      border-collapse: collapse;
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    th {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    tr:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    button {
+      display: block;
+      margin: 30px auto 0;
+      padding: 10px 20px;
+      background-color: #333;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
-  <main class="center">
-    <h1>Classement</h1>
-    <table>
-      <thead>
-        <tr><th>Rang</th><th>Joueur</th><th>Victoires</th></tr>
-      </thead>
-      <tbody id="leaderboardBody">
-        <!-- rempli dynamiquement -->
-      </tbody>
-    </table>
-    <a href="game.html" class="btn">Retour au jeu</a>
-  </main>
+
+  <h1>Classement CodeMaster</h1>
+
+  <table id="leaderboard">
+    <thead>
+      <tr>
+        <th>Position</th>
+        <th>Joueur</th>
+        <th>Victoires</th>
+        <th>Parties</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Rempli dynamiquement -->
+    </tbody>
+  </table>
+
+  <button onclick="window.location.href='index.html'">Retour au menu</button>
 
   <script>
-    fetch("/api/leaderboard").then(res => res.json()).then(data => {
-      const tbody = document.getElementById("leaderboardBody");
-      data.forEach((user, i) => {
-        const row = `<tr>
-          <td>${i + 1}</td>
-          <td>${user.username}</td>
-          <td>${user.wins}</td>
-        </tr>`;
-        tbody.innerHTML += row;
+    fetch("/api/leaderboard")
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.querySelector("#leaderboard tbody");
+        data.forEach((player, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${player.username}</td>
+            <td>${player.wins || 0}</td>
+            <td>${player.games || 0}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      })
+      .catch(err => {
+        console.error("Erreur leaderboard:", err);
       });
-    });
   </script>
+
 </body>
 </html>
