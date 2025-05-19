@@ -99,7 +99,14 @@
     <h2>Joueurs en ligne</h2>
     <ul id="userList"></ul>
   </div>
-
+<div class="section" id="chatSection">
+  <h2>Chat en temps réel</h2>
+  <div id="chatBox" style="height: 200px; overflow-y: auto; background: #111; padding: 10px; border-radius: 8px;"></div>
+  <div class="flex" style="margin-top: 10px;">
+    <input id="chatInput" type="text" placeholder="Tape ton message ici..." />
+    <button onclick="sendMessage()">Envoyer</button>
+  </div>
+</div>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
     const socket = io();
