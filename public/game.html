@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>CodeMaster - Jeu</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="game-container">
+    <h1>CodeMaster</h1>
+    <div id="welcomeUser"></div>
+
+    <div class="mode-select">
+      <button onclick="startGame('solo')">Mode Solo</button>
+      <button onclick="startGame('duel')">Mode Duel</button>
+    </div>
+
+    <div id="gameArea" style="display: none;">
+      <p id="gameStatus"></p>
+      <input type="text" id="guessInput" maxlength="4" placeholder="Entrez un code à 4 chiffres" />
+      <button onclick="submitGuess()">Valider</button>
+      <button onclick="abandonGame()">Abandonner</button>
+      <div id="guessHistory"></div>
+    </div>
+  </main>
+
+  <script>
+    let mode = "solo";
+    let secretCode = "";
+    let playing = false;
+    let score = 0;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const username = localStorage.getItem("username");
+      if (!username) return window.location.href = "login.html";
+      document.getElementById("welcomeUser").innerText = `Bienvenue ${username} !`;
+    });
+
+    function startGame(selectedMode) {
+      mode = selectedMode;
+      secretCode = generateCode();
+      playing = true;
+      document.getElementById("gameArea").style.display = "block";
+      document.getElementById("gameStatus").innerText = `Le jeu a commencé (${mode}) !`;
+      document.getElementById("guessHistory").innerHTML = "";
+    }
+
+    function generateCode() {
+      let code = "";
+      for (let i = 0; i < 4; i++) code += Math.floor(Math.random() * 10);
+      return code;
+    }
+
+    function submitGuess() {
+      if (!playing) return;
+      const guess = document.getElementById("guessInput").value;
+      if (guess.length !== 4 || isNaN(guess)) return alert("Entrez 4 chiffres !");
+      const result = checkGuess(secretCode, guess);
+      document.getElementById("guessHistory").innerHTML += `<p>${guess} → ${result}</p>`;
+      document.getElementById("guessInput").value = "";
+
+      if (guess === secretCode) {
+        playing = false;
+        alert("Félicitations ! Tu as trouvé le code !");
+        document.getElementById("gameStatus").innerText = "Tu as gagné !";
+      }
+    }
+
+    function abandonGame() {
+      playing = false;
+      alert("Tu as abandonné. Le code était : " + secretCode);
+      document.getElementById("gameStatus").innerText = "Jeu terminé.";
+    }
+
+    function checkGuess(secret, guess) {
+      let correct = 0, wellPlaced = 0;
+      const secretArray = secret.split("");
+      const guessArray = guess.split("");
+
+      guessArray.forEach((digit, index) => {
+        if (secretArray.includes(digit)) correct++;
+        if (digit === secretArray[index]) wellPlaced++;
+      });
+
+      return `${correct} chiffre(s) correct(s), ${wellPlaced} bien placé(s)`;
+    }
+  </script>
+</body>
+</html>
