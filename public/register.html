@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Inscription - CodeMaster</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="form-container">
+    <h2>Créer un compte</h2>
+    <form id="registerForm">
+      <input type="text" id="username" placeholder="Nom d'utilisateur" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Mot de passe" required />
+      <button type="submit">S'inscrire</button>
+    </form>
+    <p>Déjà un compte ? <a href="login.html">Connexion</a></p>
+  </main>
+  <script>
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("username").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("Compte créé, connecte-toi !");
+        window.location.href = "login.html";
+      } else {
+        alert(data.error || "Erreur lors de l'inscription");
+      }
+    });
+  </script>
+</body>
+</html>
