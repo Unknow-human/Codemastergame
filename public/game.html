@@ -228,6 +228,20 @@
       playing = false;
       isDuel = false;
     });
+    function sendMessage() {
+  const msg = document.getElementById("chatInput").value;
+  if (!msg.trim()) return;
+  socket.emit("chatMessage", { username, message: msg });
+  document.getElementById("chatInput").value = "";
+}
+
+socket.on("chatMessage", ({ username: sender, message }) => {
+  const chatBox = document.getElementById("chatBox");
+  const msgEl = document.createElement("div");
+  msgEl.innerHTML = `<strong>${sender}:</strong> ${message}`;
+  chatBox.appendChild(msgEl);
+  chatBox.scrollTop = chatBox.scrollHeight;
+});
   </script>
   <script>
   const themeBtn = document.getElementById("toggleTheme");
