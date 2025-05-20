@@ -2,7 +2,7 @@
   "name": "codemaster-duel",
   "version": "1.0.0",
   "description": "Un jeu de déduction de code en temps réel avec matchmaking, chat et UI/UX premium.",
-  "main": "server/index.js",
+  "main": "backend/server/index.js",
   "scripts": {
     "start": "node server/index.js",
     "dev": "next dev",
