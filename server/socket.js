@@ -1,26 +1,24 @@
-const socketIo = require("socket.io");
+const io = require("socket.io")(3001, {
+  cors: {
+    origin: "*",
+  },
+});
 
-const initializeSocket = (server) => {
-  const io = socketIo(server);
+io.on("connection", (socket) => {
+  console.log(`Utilisateur connecté : ${socket.id}`);
 
-  io.on("connection", (socket) => {
-    console.log(`Utilisateur connecté : ${socket.id}`);
-
-    socket.on("sendMessage", (message) => {
-      io.emit("newMessage", message);
-    });
-
-    socket.on("joinMatchmaking", (player) => {
-      console.log(`${player.name} a rejoint le matchmaking.`);
-      io.emit("playerJoined", player);
-    });
-
-    socket.on("disconnect", () => {
-      console.log(`Utilisateur déconnecté : ${socket.id}`);
-    });
+  socket.on("sendMessage", (message) => {
+    io.emit("receiveMessage", message);
   });
 
-  return io;
-};
+  socket.on("matchRequest", () => {
+    console.log(`Matchmaking demandé par ${socket.id}`);
+    // Logique de matchmaking ici
+  });
 
-module.exports = { initializeSocket };
+  socket.on("disconnect", () => {
+    console.log(`Utilisateur déconnecté : ${socket.id}`);
+  });
+});
+
+module.exports = io;
